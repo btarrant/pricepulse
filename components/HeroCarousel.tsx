@@ -14,7 +14,7 @@ const heroImages = [
 
 const HeroCarousel = () => {
   return (
-    <div>
+    <div className="hero-carousel">
       <Carousel
         showThumbs={false}
         autoPlay
