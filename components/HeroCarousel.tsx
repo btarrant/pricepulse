@@ -2,7 +2,7 @@
 
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { Carousel } from "react-responsive-carousel";
-import handDrawnArrow from "path/to/hand-drawn-arrow.svg";
+import handDrawnArrow from "../public/assets/icons/hand-drawn-arrow.svg";
 import Image from "next/image";
 
 const heroImages = [
