@@ -2,6 +2,8 @@
 
 PricePulse is an e-commerce price tracking app built with Next.js. It leverages web scraping and cron jobs to keep users updated on price changes for their favorite products. With PricePulse, users can simply input an Amazon product link, and the app will handle the rest, providing regular updates on pricing and availability.
 
+Live Link: https://pricepulse-cyan.vercel.app
+
 ![Screenshot 2024-03-31 at 1 23 05 PM](https://github.com/btarrant/pricepulse/assets/93632053/5b9aa7ff-181c-416c-8c1f-40c95db971d1)
 
 <div align="center">
