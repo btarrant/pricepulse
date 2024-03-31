@@ -37,7 +37,16 @@
   }
 
   .hero-carousel {
-    @apply relative sm:px-10 py-5 sm:pt-20 pb-5 max-w-[560px] h-[700px] w-full bg-[#F2F4F7] rounded-[30px] sm:mx-auto;
+    @apply relative sm:px-10 py-5 sm:pt-20 pb-5 max-w-[560px] w-full bg-[#F2F4F7] rounded-[30px] sm:mx-auto;
+    height: 700px; /* Default height for larger screens */
+  }
+
+  @media (max-width: 640px) {
+    /* Adjust the breakpoint according to your design */
+    .hero-carousel {
+      height: 400px; /* Adjust the height for mobile devices */
+      padding-bottom: 3rem; /* Adjust the padding underneath for mobile devices */
+    }
   }
 
   .carousel {
@@ -56,8 +65,11 @@
     @apply bg-[#475467] !important;
   }
 
-  .trending-section {
-    @apply flex flex-col gap-10 px-6 md:px-20 py-24;
+  @media (max-width: 640px) {
+    /* Adjust the breakpoint as needed */
+    .trending-section {
+      @apply py-12; /* Adjust the padding on the y-axis for mobile devices */
+    }
   }
 
   /* PRODUCT DETAILS PAGE STYLES */
