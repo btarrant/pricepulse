@@ -94,15 +94,29 @@ export async function scrapeAndStoreProduct(productUrl: string) {
 //   }
 // }
 
-export async function getAllProducts() {
+export async function getAllProducts(): Promise<
+  {
+    _id: string;
+    name: string;
+    price?: string;
+    currentPrice?: string;
+    image: string;
+    url: string;
+  }[]
+> {
   try {
-    // connectToDB();
-
-    // const products = await Product.find();
-
-    return [];
+    return [
+      {
+        _id: "mock123",
+        name: "Kakanuo Lamp – Charging Dimmable Nightstand",
+        currentPrice: "$24.99",
+        image: "/assets/images/lamp.jpg",
+        url: "https://www.amazon.com/Kakanuo-Charging-Dimmable-Nightstand-Included/dp/B0C38TZDZS",
+      },
+    ];
   } catch (error) {
     console.log(error);
+    return [];
   }
 }
 // export async function getSimilarProducts(productId: string) {
