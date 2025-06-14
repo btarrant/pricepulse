@@ -22,8 +22,7 @@ const Home = async () => {
               <span className="text-primary"> PricePulse</span>
             </h1>
             <p className="mt-6">
-              Powerful, self-serve product and growth analytics to help you convert, engage, and
-              retain more.
+              Stay ahead of price drops with automatic tracking and alerts!
             </p>
             <Searchbar />
           </div>
