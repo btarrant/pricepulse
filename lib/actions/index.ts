@@ -40,10 +40,14 @@ export async function scrapeAndStoreProduct(productUrl: string) {
     const newProduct = await Product.findOneAndUpdate({ url: scrapedProduct.url }, product, {
       upsert: true,
       new: true,
-    });
+    }).lean();
 
     revalidatePath(`/products/${newProduct._id}`);
-    return newProduct;
+    
+    return {
+      ...newProduct,
+      _id: newProduct._id.toString(),
+    };
   } catch (error: any) {
     throw new Error(`Failed to create/update product: ${error.message}`);
   }
@@ -53,15 +57,27 @@ export async function getProductById(productId: string) {
   try {
     connectToDB();
 
-    const product = await Product.findOne({ _id: productId });
+    const product = await Product.findById(productId).lean();
 
     if (!product) return null;
 
-    return product;
+    return {
+      ...product,
+      _id: product._id.toString(),
+    };
   } catch (error) {
     console.log(error);
   }
 }
+
+type LeanProduct = {
+  _id: any;
+  name: string;
+  price?: string;
+  currentPrice?: string;
+  image: string;
+  url: string;
+};
 
 export async function getAllProducts(): Promise<
   {
@@ -75,8 +91,16 @@ export async function getAllProducts(): Promise<
 > {
   try {
     await connectToDB();
-    const products = await Product.find().sort({ createdAt: -1 }).limit(20);
-    return products;
+
+    const products = (await Product.find()
+      .sort({ createdAt: -1 })
+      .limit(20)
+      .lean()) as LeanProduct[];
+
+      return products.map((product) => ({
+        ...product,
+        _id: product._id.toString(),
+      }));
   } catch (error) {
     console.log(error);
     return [];
@@ -87,15 +111,19 @@ export async function getSimilarProducts(productId: string) {
   try {
     connectToDB();
 
-    const currentProduct = await Product.findById(productId);
+    const currentProduct = await Product.findById(productId).lean();
 
     if (!currentProduct) return null;
 
     const similarProducts = await Product.find({
-      _id: { $ne: productId },
-    }).limit(3);
+      _id: { $ne: productId },})
+      .limit(3)
+      .lean();
 
-    return similarProducts;
+    return similarProducts.map((product: { _id: { toString: () => any; }; }) => ({
+      ...product,
+      _id: product._id.toString(),
+    }));
   } catch (error) {
     console.log(error);
   }
