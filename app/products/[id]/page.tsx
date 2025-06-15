@@ -1,6 +1,7 @@
 import Modal from "@/components/Modal";
 import PriceInfoCard from "@/components/PriceInfoCard";
 import ProductCard from "@/components/ProductCard";
+import FavoriteToggle from "@/components/FavoriteToggle";
 import { getProductById, getSimilarProducts } from "@/lib/actions";
 import { formatNumber } from "@/lib/utils";
 import { Product } from "@/types";
@@ -13,7 +14,7 @@ type Props = {
 };
 
 const ProductDetails = async ({ params: { id } }: Props) => {
-  const product: Product = await getProductById(id);
+  const product = await getProductById(id);
 
   if (!product) redirect("/");
 
@@ -40,8 +41,8 @@ const ProductDetails = async ({ params: { id } }: Props) => {
               </Link>
             </div>
             <div className="flex items-center gap-3">
-              <div className="product-hearts">
-                <Image src="/assets/icons/red-heart.svg" alt="heart" width={20} height={20} />
+              <div className="flex items-center gap-2">
+                <FavoriteToggle productId={product._id} />
                 <p className="text-base font-semibold text-[#D46F77]">{product.reviewsCount}</p>
               </div>
               <div className="p-2 bg-white-200 rounded-10">
@@ -52,6 +53,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
               </div>
             </div>
           </div>
+
           <div className="product-info">
             <div className="flex flex-col gap-2">
               <p className="text-[34px] text-secondary font-bold">
@@ -82,6 +84,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
               </p>
             </div>
           </div>
+
           <div className="my-7 flex flex-col gap-5">
             <div className="flex gap-5 flex-wrap">
               <PriceInfoCard
@@ -113,7 +116,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
       <div className="flex flex-col gap-16">
         <div className="flex flex-col gap-5">
           <h3 className="text-2xl text-secondary font-semibold">Product Description</h3>
-          <div className="flex flex-col gap-4">{product?.description?.split("\n")}</div>
+          <div className="flex flex-col gap-4">{product.description?.split("\n")}</div>
         </div>
         <a
           href={product.url}
@@ -125,12 +128,13 @@ const ProductDetails = async ({ params: { id } }: Props) => {
           Buy Now
         </a>
       </div>
-      {similarProducts && similarProducts?.length > 0 && (
+
+      {similarProducts && similarProducts.length > 0 && (
         <div className="py-14 flex flex-col gap-2 w-full">
           <p className="section-text">Similar Products</p>
           <div className="flex flex-wrap gap-10 mt-7 w-full">
-            {similarProducts.map((product) => (
-              <ProductCard key={product._id} product={product} />
+            {similarProducts.map((item) => (
+              <ProductCard key={item._id} product={item} />
             ))}
           </div>
         </div>
