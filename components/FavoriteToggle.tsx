@@ -16,8 +16,8 @@ const FavoriteToggle = ({ productId, count }: Props) => {
     setIsFav(getFavorites().includes(productId));
   }, [productId]);
 
-  const triggerStorageEvent = () => {
-    localStorage.setItem("favorites-sync", Date.now().toString());
+  const triggerFavoritesChange = () => {
+    window.dispatchEvent(new Event("favorites-updated"));
   };
 
   const toggleFavorite = () => {
@@ -27,8 +27,9 @@ const FavoriteToggle = ({ productId, count }: Props) => {
       saveFavorite(productId);
     }
     setIsFav(!isFav);
-    triggerStorageEvent();
+    triggerFavoritesChange();
   };
+  
 
   return (
     <button

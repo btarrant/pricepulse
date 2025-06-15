@@ -16,8 +16,8 @@ const Navbar = () => {
 
     updateFavorites();
 
-    window.addEventListener("storage", updateFavorites);
-    return () => window.removeEventListener("storage", updateFavorites);
+    window.addEventListener("favorites-updated", updateFavorites);
+    return () => window.removeEventListener("favorites-updated", updateFavorites);
   }, []);
 
   return (
