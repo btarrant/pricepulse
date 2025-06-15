@@ -9,6 +9,8 @@ type Props = {
   count?: number;
 };
 
+const FAKE_EMAIL = "demo@pricepulse.com"; // Replace with session user email in the future
+
 const FavoriteToggle = ({ productId, count }: Props) => {
   const [isFav, setIsFav] = useState(false);
 
@@ -20,11 +22,21 @@ const FavoriteToggle = ({ productId, count }: Props) => {
     window.dispatchEvent(new Event("favorites-updated"));
   };
 
-  const toggleFavorite = () => {
+  const toggleFavorite = async () => {
     if (isFav) {
       removeFavorite(productId);
+      await fetch("/api/favorites/remove", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId, email: FAKE_EMAIL }),
+      });
     } else {
       saveFavorite(productId);
+      await fetch("/api/favorites/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId, email: FAKE_EMAIL }),
+      });
     }
     setIsFav(!isFav);
     triggerFavoritesChange();
