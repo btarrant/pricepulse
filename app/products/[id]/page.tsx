@@ -43,7 +43,9 @@ const ProductDetails = async ({ params: { id } }: Props) => {
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
                 <FavoriteToggle productId={product._id} />
-                <p className="text-base font-semibold text-[#D46F77]">{product.reviewsCount}</p>
+                <p className="text-base font-semibold text-[#D46F77]">
+                {product.users?.length ?? 0}
+                </p>
               </div>
               <div className="p-2 bg-white-200 rounded-10">
                 <Image src="/assets/icons/bookmark.svg" alt="bookmark" width={20} height={20} />

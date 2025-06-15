@@ -24,7 +24,7 @@ export interface Product {
   reviewsCount?: number;
   stars?: number;
   isOutOfStock?: boolean;
-  users: { email: string }[];
+  users?: { email: string }[];
   createdAt?: string;
   updatedAt?: string;
 };

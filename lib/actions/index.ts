@@ -66,12 +66,14 @@ export async function getProductById(productId: string): Promise<Product | null>
     return {
       ...(product as Omit<Product, "_id">),
       _id: product._id.toString(),
+      users: product.users ?? [],
     };
   } catch (error) {
     console.log(error);
     return null;
   }
 }
+
 
 
 type LeanProduct = {
