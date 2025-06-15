@@ -16,6 +16,10 @@ const FavoriteToggle = ({ productId, count }: Props) => {
     setIsFav(getFavorites().includes(productId));
   }, [productId]);
 
+  const triggerStorageEvent = () => {
+    localStorage.setItem("favorites-sync", Date.now().toString());
+  };
+
   const toggleFavorite = () => {
     if (isFav) {
       removeFavorite(productId);
@@ -23,6 +27,7 @@ const FavoriteToggle = ({ productId, count }: Props) => {
       saveFavorite(productId);
     }
     setIsFav(!isFav);
+    triggerStorageEvent();
   };
 
   return (

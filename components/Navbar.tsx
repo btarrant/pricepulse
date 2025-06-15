@@ -9,30 +9,15 @@ const Navbar = () => {
   const [hasFavorites, setHasFavorites] = useState(false);
 
   useEffect(() => {
-    // Initial check
-    const favorites = getFavorites();
-    setHasFavorites(favorites.length > 0);
-  }, []);
-
-  useEffect(() => {
-    const syncFavorites = () => {
-      const favorites = getFavorites();
-      setHasFavorites(favorites.length > 0);
+    const updateFavorites = () => {
+      const favs = getFavorites();
+      setHasFavorites(favs.length > 0);
     };
 
-    window.addEventListener("storage", syncFavorites);
-    return () => window.removeEventListener("storage", syncFavorites);
-  }, []);
+    updateFavorites();
 
-  // Optional: refresh on focus (in case user navigates away/back)
-  useEffect(() => {
-    const onFocus = () => {
-      const favorites = getFavorites();
-      setHasFavorites(favorites.length > 0);
-    };
-
-    window.addEventListener("focus", onFocus);
-    return () => window.removeEventListener("focus", onFocus);
+    window.addEventListener("storage", updateFavorites);
+    return () => window.removeEventListener("storage", updateFavorites);
   }, []);
 
   return (
@@ -44,16 +29,16 @@ const Navbar = () => {
             Price<span className="text-primary">Pulse</span>
           </p>
         </Link>
-
         <div className="flex items-center gap-5">
-          <Image
-            src="/assets/icons/search.svg"
-            alt="search"
-            width={28}
-            height={28}
-            className="object-contain"
-          />
-
+          <Link href="/search">
+            <Image
+              src="/assets/icons/search.svg"
+              alt="search"
+              width={28}
+              height={28}
+              className="object-contain"
+            />
+          </Link>
           <Link href="/favorites">
             <Image
               src={
@@ -67,14 +52,15 @@ const Navbar = () => {
               className="object-contain"
             />
           </Link>
-
-          <Image
-            src="/assets/icons/user.svg"
-            alt="user"
-            width={28}
-            height={28}
-            className="object-contain"
-          />
+          <Link href="/profile">
+            <Image
+              src="/assets/icons/user.svg"
+              alt="user"
+              width={28}
+              height={28}
+              className="object-contain"
+            />
+          </Link>
         </div>
       </nav>
     </header>
