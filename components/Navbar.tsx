@@ -19,16 +19,22 @@ const Navbar = () => {
           </p>
         </Link>
         <div className="flex items-center gap-5">
-          {navIcons.map((icon) => (
-            <Image
-              key={icon.alt}
-              src={icon.src}
-              alt={icon.alt}
-              width={28}
-              height={28}
-              className="object-contain"
-            />
-          ))}
+          {navIcons.map((icon) => {
+            const isHeart = icon.alt === "heart";
+            const href = isHeart ? "/favorites" : "#";
+
+            return (
+              <Link href={href} key={icon.alt} aria-label={icon.alt}>
+                <Image
+                  src={icon.src}
+                  alt={icon.alt}
+                  width={28}
+                  height={28}
+                  className="object-contain"
+                />
+              </Link>
+            );
+          })}
         </div>
       </nav>
     </header>
