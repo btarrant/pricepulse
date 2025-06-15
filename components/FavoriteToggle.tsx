@@ -9,7 +9,7 @@ type Props = {
   count?: number;
 };
 
-const FavoriteToggle = ({ productId, count = 0 }: Props) => {
+const FavoriteToggle = ({ productId, count }: Props) => {
   const [isFav, setIsFav] = useState(false);
 
   useEffect(() => {
@@ -26,17 +26,21 @@ const FavoriteToggle = ({ productId, count = 0 }: Props) => {
   };
 
   return (
-    <div className="product-hearts cursor-pointer" onClick={toggleFavorite}>
+    <button
+      className="product-hearts cursor-pointer"
+      onClick={toggleFavorite}
+      aria-label={isFav ? "Remove from favorites" : "Add to favorites"}
+    >
       <Image
         src={isFav ? "/assets/icons/red-heart.svg" : "/assets/icons/heart.svg"}
         alt="heart"
         width={20}
         height={20}
       />
-      <p className="text-base font-semibold text-[#D46F77]">
-        {count}
-      </p>
-    </div>
+      {typeof count === "number" && (
+        <p className="text-base font-semibold text-[#D46F77]">{count}</p>
+      )}
+    </button>
   );
 };
 
