@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import type { SessionStrategy } from "next-auth";
 
 export const authOptions = {
   providers: [
@@ -13,7 +14,7 @@ export const authOptions = {
     signIn: "/login",
   },
   session: {
-    strategy: "jwt",
+    strategy: "jwt" as SessionStrategy,
   },
 };
 

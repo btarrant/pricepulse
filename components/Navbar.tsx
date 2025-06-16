@@ -4,9 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getFavorites } from "@/lib/favorites";
+import { useSession, signIn, signOut } from "next-auth/react";
 
 const Navbar = () => {
   const [hasFavorites, setHasFavorites] = useState(false);
+  const { data: session } = useSession();
+  const user = session?.user;
 
   useEffect(() => {
     const updateFavorites = () => {
@@ -29,6 +32,7 @@ const Navbar = () => {
             Price<span className="text-primary">Pulse</span>
           </p>
         </Link>
+
         <div className="flex items-center gap-5">
           <Link href="/search">
             <Image
@@ -61,6 +65,22 @@ const Navbar = () => {
               className="object-contain"
             />
           </Link>
+
+          {user ? (
+            <button
+              onClick={() => signOut()}
+              className="text-sm underline text-gray-700"
+            >
+              Sign out ({user.email})
+            </button>
+          ) : (
+            <button
+              onClick={() => signIn("google")}
+              className="text-sm underline text-primary"
+            >
+              Sign in
+            </button>
+          )}
         </div>
       </nav>
     </header>
