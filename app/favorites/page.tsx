@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { getFavorites } from "@/lib/favorites";
 import { Product } from "@/types";
 import ProductCard from "@/components/ProductCard";
+import Image from "next/image";
+import Link from "next/link";
 
 const FavoritesPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -37,7 +39,22 @@ const FavoritesPage = () => {
       <h1 className="text-2xl font-bold mb-6">Your Favorites</h1>
 
       {products.length === 0 ? (
-        <p className="text-gray-500">No favorites yet.</p>
+        <div className="flex flex-col items-center justify-center gap-4 mt-16">
+          <Image
+            src="/assets/images/favoriteicon.svg"
+            alt="No favorites yet"
+            width={300}
+            height={300}
+          />
+          <p className="text-lg text-gray-600">You haven’t added any favorites yet.</p>
+          <Link
+              href="/#trending"
+              scroll={true}
+              className="btn bg-primary text-white px-6 py-2 rounded-md"
+            >
+              Browse Products
+            </Link>
+        </div>
       ) : (
         <div className="flex flex-wrap gap-8">
           {products.map((product) => (
