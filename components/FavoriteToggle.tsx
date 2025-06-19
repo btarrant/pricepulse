@@ -3,45 +3,48 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { getFavorites, saveFavorite, removeFavorite } from "@/lib/favorites";
+import { useSession } from "next-auth/react";
 
 type Props = {
   productId: string;
   count?: number;
 };
 
-const FAKE_EMAIL = "demo@pricepulse.com"; // Replace with session user email in the future
-
 const FavoriteToggle = ({ productId, count }: Props) => {
   const [isFav, setIsFav] = useState(false);
+  const { data: session } = useSession();
 
   useEffect(() => {
-    setIsFav(getFavorites().includes(productId));
-  }, [productId]);
+    const checkFavorite = async () => {
+      if (session?.user) {
+        // Optionally fetch user favorites from server if needed
+        // But assuming this product is marked from server render
+      } else {
+        setIsFav(getFavorites().includes(productId));
+      }
+    };
+    checkFavorite();
+  }, [productId, session]);
 
   const triggerFavoritesChange = () => {
     window.dispatchEvent(new Event("favorites-updated"));
   };
 
   const toggleFavorite = async () => {
-    if (isFav) {
-      removeFavorite(productId);
-      await fetch("/api/favorites/remove", {
-        method: "POST",
+    if (session?.user) {
+      const method = isFav ? "DELETE" : "POST";
+      await fetch("/api/user/favorites", {
+        method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId, email: FAKE_EMAIL }),
+        body: JSON.stringify({ productId }),
       });
     } else {
-      saveFavorite(productId);
-      await fetch("/api/favorites/add", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId, email: FAKE_EMAIL }),
-      });
+      isFav ? removeFavorite(productId) : saveFavorite(productId);
+      triggerFavoritesChange();
     }
-    setIsFav(!isFav);
-    triggerFavoritesChange();
+
+    setIsFav((prev) => !prev);
   };
-  
 
   return (
     <button
