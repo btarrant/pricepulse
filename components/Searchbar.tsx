@@ -39,8 +39,8 @@ const Searchbar = () => {
       const product = await scrapeAndStoreProduct(searchPrompt);
       if (product) {
         setProduct({
-          name: product.name,
-          price: product.currentPrice,
+          name: product.title ?? "Untitled Product",
+          price: `$${product.currentPrice.toFixed(2)}`,
           image: product.image,
           url: product.url,
         });
