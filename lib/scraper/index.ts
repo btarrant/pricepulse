@@ -1,8 +1,11 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
 import { extractCurrency, extractPrice, extractDescription } from "../utils";
+import { Product } from "@/types";
 
-export async function scrapeAmazonProduct(url: string) {
+export type ScrapedProduct = Omit<Product, "_id" | "users">;
+
+export async function scrapeAmazonProduct(url: string): Promise<ScrapedProduct | undefined> {
   if (!url) return;
 
   // BrightData proxy config
@@ -68,7 +71,12 @@ export async function scrapeAmazonProduct(url: string) {
       title,
       currentPrice: Number(currentPrice) || Number(originalPrice),
       originalPrice: Number(originalPrice) || Number(currentPrice),
-      priceHistory: [],
+      priceHistory: [
+        {
+          price: Number(currentPrice) || Number(originalPrice),
+          date: new Date().toISOString(),
+        },
+      ],
       discountRate: Number(discountRate),
       category: "category",
       reviewsCount: 100,

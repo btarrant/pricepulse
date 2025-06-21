@@ -3,8 +3,12 @@
 import { revalidatePath } from "next/cache";
 import ProductModel from "../models/product.model";
 import { connectToDB } from "../mongoose";
-import { scrapeAmazonProduct } from "../scraper";
-import { getAveragePrice, getHighestPrice, getLowestPrice } from "../utils";
+import { scrapeAmazonProduct, ScrapedProduct } from "../scraper";
+import {
+  getAveragePrice,
+  getHighestPrice,
+  getLowestPrice,
+} from "../utils";
 import { Product, User } from "@/types";
 import { generateEmailBody, sendEmail } from "../nodemailer";
 
@@ -17,14 +21,14 @@ export async function scrapeAndStoreProduct(productUrl: string) {
     const scrapedProduct = await scrapeAmazonProduct(productUrl);
     if (!scrapedProduct) return;
 
-    let product = scrapedProduct;
+    let product: ScrapedProduct = scrapedProduct;
 
     const existingProduct = await ProductModel.findOne({ url: scrapedProduct.url });
 
     if (existingProduct) {
-      const updatedPriceHistory: any = [
+      const updatedPriceHistory: { price: number; date: string }[] = [
         ...existingProduct.priceHistory,
-        { price: scrapedProduct.currentPrice },
+        { price: scrapedProduct.currentPrice, date: new Date().toISOString() },
       ];
 
       product = {
@@ -40,14 +44,14 @@ export async function scrapeAndStoreProduct(productUrl: string) {
       { url: scrapedProduct.url },
       product,
       { upsert: true, new: true }
-    ).lean();
+    );
 
     if (!newProduct) return null;
 
     revalidatePath(`/products/${newProduct._id}`);
 
     return {
-      ...newProduct,
+      ...(newProduct.toObject() as Omit<Product, "_id">),
       _id: newProduct._id.toString(),
     };
   } catch (error: any) {
@@ -59,13 +63,27 @@ export async function getProductById(productId: string): Promise<Product | null>
   try {
     await connectToDB();
 
-    const product = await ProductModel.findById(productId).lean();
-
+    const product = await ProductModel.findById(productId).lean() as unknown as Product;
     if (!product) return null;
 
     return {
-      ...(product as Omit<Product, "_id">),
       _id: product._id.toString(),
+      url: product.url,
+      currency: product.currency ?? "$",
+      image: product.image,
+      title: product.title,
+      currentPrice: product.currentPrice,
+      originalPrice: product.originalPrice ?? product.currentPrice,
+      priceHistory: product.priceHistory ?? [],
+      discountRate: product.discountRate ?? 0,
+      category: product.category ?? "Uncategorized",
+      reviewsCount: product.reviewsCount ?? 0,
+      stars: product.stars ?? 0,
+      isOutOfStock: product.isOutOfStock ?? false,
+      description: product.description ?? "",
+      lowestPrice: product.lowestPrice ?? product.currentPrice,
+      highestPrice: product.highestPrice ?? product.currentPrice,
+      averagePrice: product.averagePrice ?? product.currentPrice,
       users: product.users ?? [],
     };
   } catch (error) {
@@ -74,30 +92,38 @@ export async function getProductById(productId: string): Promise<Product | null>
   }
 }
 
-
-
-type LeanProduct = {
-  _id: any;
-  name: string;
-  price?: string;
-  currentPrice?: string;
-  image: string;
-  url: string;
-};
-
-export async function getAllProducts(): Promise<LeanProduct[]> {
+export async function getAllProducts(): Promise<Product[]> {
   try {
     await connectToDB();
 
-    const products = (await ProductModel.find()
+    const products = await ProductModel.find()
       .sort({ createdAt: -1 })
       .limit(20)
-      .lean()) as LeanProduct[];
+      .lean();
 
-    return products.map((product) => ({
-      ...product,
-      _id: product._id.toString(),
-    }));
+    return products.map((product) => {
+      const p = product as unknown as Product;
+      return {
+        _id: p._id.toString(),
+        url: p.url,
+        currency: p.currency ?? "$",
+        image: p.image,
+        title: p.title,
+        currentPrice: p.currentPrice,
+        originalPrice: p.originalPrice ?? p.currentPrice,
+        priceHistory: p.priceHistory ?? [],
+        discountRate: p.discountRate ?? 0,
+        category: p.category ?? "Uncategorized",
+        reviewsCount: p.reviewsCount ?? 0,
+        stars: p.stars ?? 0,
+        isOutOfStock: p.isOutOfStock ?? false,
+        description: p.description ?? "",
+        lowestPrice: p.lowestPrice ?? p.currentPrice,
+        highestPrice: p.highestPrice ?? p.currentPrice,
+        averagePrice: p.averagePrice ?? p.currentPrice,
+        users: p.users ?? [],
+      };
+    });
   } catch (error) {
     console.log(error);
     return [];
@@ -115,10 +141,29 @@ export async function getSimilarProducts(productId: string): Promise<Product[] |
       .limit(3)
       .lean();
 
-    return similarProducts.map((product) => ({
-      ...product,
-      _id: product._id.toString(),
-    })) as Product[];
+    return similarProducts.map((product) => {
+      const p = product as unknown as Product;
+      return {
+        _id: p._id.toString(),
+        url: p.url,
+        currency: p.currency ?? "$",
+        image: p.image,
+        title: p.title,
+        currentPrice: p.currentPrice,
+        originalPrice: p.originalPrice ?? p.currentPrice,
+        priceHistory: p.priceHistory ?? [],
+        discountRate: p.discountRate ?? 0,
+        category: p.category ?? "Uncategorized",
+        reviewsCount: p.reviewsCount ?? 0,
+        stars: p.stars ?? 0,
+        isOutOfStock: p.isOutOfStock ?? false,
+        description: p.description ?? "",
+        lowestPrice: p.lowestPrice ?? p.currentPrice,
+        highestPrice: p.highestPrice ?? p.currentPrice,
+        averagePrice: p.averagePrice ?? p.currentPrice,
+        users: p.users ?? [],
+      };
+    });
   } catch (error) {
     console.log(error);
     return null;
@@ -127,6 +172,8 @@ export async function getSimilarProducts(productId: string): Promise<Product[] |
 
 export async function addUserEmailToProduct(productId: string, userEmail: string) {
   try {
+    await connectToDB();
+
     const product = await ProductModel.findById(productId);
     if (!product) return;
 
