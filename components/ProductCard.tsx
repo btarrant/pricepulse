@@ -6,9 +6,10 @@ import React from "react";
 
 interface Props {
   product: Product;
+  onUnfavorite?: () => void;
 }
 
-const ProductCard = ({ product }: Props) => {
+const ProductCard = ({ product, onUnfavorite }: Props) => {
   return (
     <Link href={`/products/${product._id}`} className="product-card">
       <div className="product-card_img-container">
@@ -26,6 +27,7 @@ const ProductCard = ({ product }: Props) => {
         <FavoriteToggle
           productId={product._id}
           count={product.users?.length ?? 0}
+          onUnfavorite={onUnfavorite}
         />
           <p className="text-black opacity-50 text-lg capitalize">{product.category}</p>
           <p className="text-black text-lg font-semibold">

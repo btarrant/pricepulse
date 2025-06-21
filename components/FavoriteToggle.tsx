@@ -8,9 +8,10 @@ import { useSession } from "next-auth/react";
 type Props = {
   productId: string;
   count?: number;
+  onUnfavorite?: () => void;
 };
 
-const FavoriteToggle = ({ productId, count }: Props) => {
+const FavoriteToggle = ({ productId, count, onUnfavorite }: Props) => {
   const [isFav, setIsFav] = useState(false);
   const { data: session } = useSession();
 
@@ -45,6 +46,12 @@ const FavoriteToggle = ({ productId, count }: Props) => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ productId }),
         });
+
+        triggerFavoritesChange();
+
+        if (isFav && onUnfavorite) {
+          onUnfavorite();
+        }
       } catch (err) {
         console.error("Failed to update favorite:", err);
       }
@@ -59,7 +66,11 @@ const FavoriteToggle = ({ productId, count }: Props) => {
   return (
     <button
       className="product-hearts cursor-pointer"
-      onClick={toggleFavorite}
+      onClick={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        toggleFavorite();
+      }}
       aria-label={isFav ? "Remove from favorites" : "Add to favorites"}
     >
       <Image
@@ -76,3 +87,4 @@ const FavoriteToggle = ({ productId, count }: Props) => {
 };
 
 export default FavoriteToggle;
+

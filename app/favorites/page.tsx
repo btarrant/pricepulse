@@ -21,7 +21,7 @@ const { data: session } = useSession();
     let ids: string[] = [];
 
     if (session?.user) {
-      const res = await fetch("/api/user/favorites/list");
+      const res = await fetch("/api/favorites/list");
       const data = await res.json();
       ids = data.favorites || [];
     } else {
@@ -104,7 +104,13 @@ const { data: session } = useSession();
       ) : (
         <div className="flex flex-wrap gap-8">
           {sortedAndFiltered.map((product) => (
-            <ProductCard key={product._id} product={product} />
+            <ProductCard
+              key={product._id}
+              product={product}
+              onUnfavorite={() =>
+                setProducts((prev) => prev.filter((p) => p._id !== product._id))
+              }
+        />
           ))}
         </div>
       )}

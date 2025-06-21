@@ -11,17 +11,34 @@ const Navbar = () => {
   const { data: session } = useSession();
   const user = session?.user;
 
-  useEffect(() => {
-    const updateFavorites = () => {
+useEffect(() => {
+  const updateFavorites = async () => {
+    if (user) {
+      try {
+        const res = await fetch("/api/user/favorites");
+        const data = await res.json();
+        setHasFavorites(data?.length > 0);
+      } catch (err) {
+        console.error("Failed to fetch user favorites:", err);
+        setHasFavorites(false);
+      }
+    } else {
       const favs = getFavorites();
       setHasFavorites(favs.length > 0);
-    };
+    }
+  };
 
+  updateFavorites();
+
+  // Wrap async call in a regular function for event listener
+  const handleFavoritesUpdated = () => {
     updateFavorites();
+  };
 
-    window.addEventListener("favorites-updated", updateFavorites);
-    return () => window.removeEventListener("favorites-updated", updateFavorites);
-  }, []);
+  window.addEventListener("favorites-updated", handleFavoritesUpdated);
+  return () => window.removeEventListener("favorites-updated", handleFavoritesUpdated);
+}, [user]);
+
 
   return (
     <header className="w-full">
