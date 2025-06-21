@@ -17,12 +17,18 @@ const FavoriteToggle = ({ productId, count }: Props) => {
   useEffect(() => {
     const checkFavorite = async () => {
       if (session?.user) {
-        // Optionally fetch user favorites from server if needed
-        // But assuming this product is marked from server render
+        try {
+          const res = await fetch(`/api/user/favorites/check?productId=${productId}`);
+          const data = await res.json();
+          setIsFav(data.isFavorited);
+        } catch (err) {
+          console.error("Failed to check favorite:", err);
+        }
       } else {
         setIsFav(getFavorites().includes(productId));
       }
     };
+
     checkFavorite();
   }, [productId, session]);
 
@@ -33,11 +39,15 @@ const FavoriteToggle = ({ productId, count }: Props) => {
   const toggleFavorite = async () => {
     if (session?.user) {
       const method = isFav ? "DELETE" : "POST";
-      await fetch("/api/user/favorites", {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId }),
-      });
+      try {
+        await fetch("/api/user/favorites", {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productId }),
+        });
+      } catch (err) {
+        console.error("Failed to update favorite:", err);
+      }
     } else {
       isFav ? removeFavorite(productId) : saveFavorite(productId);
       triggerFavoritesChange();

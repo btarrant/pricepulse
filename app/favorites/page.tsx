@@ -1,4 +1,3 @@
-// app/favorites/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -7,6 +6,7 @@ import { Product } from "@/types";
 import ProductCard from "@/components/ProductCard";
 import Image from "next/image";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 const FavoritesPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -14,28 +14,38 @@ const FavoritesPage = () => {
 const [sortOption, setSortOption] = useState("default");
 const [filterCategory, setFilterCategory] = useState("all");
 
+const { data: session } = useSession();
+
   useEffect(() => {
-    const fetchFavorites = async () => {
-      const ids = getFavorites();
+  const fetchFavorites = async () => {
+    let ids: string[] = [];
 
-      if (ids.length === 0) return;
+    if (session?.user) {
+      const res = await fetch("/api/user/favorites/list");
+      const data = await res.json();
+      ids = data.favorites || [];
+    } else {
+      ids = getFavorites();
+    }
 
-      try {
-        const res = await fetch("/api/favorites", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ids }),
-        });
+    if (!ids.length) return;
 
-        const data = await res.json();
-        setProducts(data);
-      } catch (err) {
-        console.error("Failed to fetch favorite products:", err);
-      }
-    };
+    try {
+      const res = await fetch("/api/favorites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids }),
+      });
 
-    fetchFavorites();
-  }, []);
+      const data = await res.json();
+      setProducts(data);
+    } catch (err) {
+      console.error("Failed to fetch favorite products:", err);
+    }
+  };
+
+  fetchFavorites();
+}, [session]);
 
   const sortedAndFiltered = products
   .filter((p) => filterCategory === "all" || p.category === filterCategory)
