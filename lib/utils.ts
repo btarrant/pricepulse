@@ -100,9 +100,22 @@ export const getEmailNotifType = (scrapedProduct: Product, currentProduct: Produ
   if (!scrapedProduct.isOutOfStock && currentProduct.isOutOfStock) {
     return Notification.CHANGE_OF_STOCK as keyof typeof Notification;
   }
-  if (scrapedProduct.discountRate >= THRESHOLD_PERCENTAGE) {
+  if (
+  typeof scrapedProduct.discountRate === "number" &&
+  scrapedProduct.discountRate >= THRESHOLD_PERCENTAGE
+  ) {
     return Notification.THRESHOLD_MET as keyof typeof Notification;
+  } else if (scrapedProduct.discountRate === undefined || typeof scrapedProduct.discountRate !== "number") {
+    console.warn(
+     `[getEmailNotifType] Missing or invalid discountRate for product:`,
+      {
+       title: scrapedProduct.title,
+        url: scrapedProduct.url,
+       discountRate: scrapedProduct.discountRate,
+      }
+    );
   }
+
 
   return null;
 };
